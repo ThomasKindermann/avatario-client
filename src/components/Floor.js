@@ -63,7 +63,7 @@ const Floor = ({ location }) => {
       if (ArrowLeft | aKey && x > 0) {
         setX(x - 1);
       }
-    }, 1);
+    }, 2);
     if (name !== "" || color !== "") {
       socket.emit("update", { name, color, x, y });
     }
