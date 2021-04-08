@@ -3,7 +3,7 @@ import queryString from "query-string";
 import io from "socket.io-client";
 import "../App.css";
 
-const ENDPOINT = "localhost:5000";
+const ENDPOINT = "https://avatario-test.herokuapp.com/";
 let socket;
 
 const Floor = ({ location }) => {
