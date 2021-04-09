@@ -3,10 +3,16 @@ import queryString from "query-string";
 import io from "socket.io-client";
 import "../App.css";
 
-const ENDPOINT = "https://avatario-test.herokuapp.com/";
+//const ENDPOINT = "https://avatario-test.herokuapp.com/";
+
+// location of server
+const ENDPOINT = "localhost:5000";
+
+//empty socket for connection
 let socket;
 
 const Floor = ({ location }) => {
+  // Calling window resize hook
   const windowDimensions = useWindowResize();
   // Calling Key Listener Hook
   const ArrowUp = useKeyPress("ArrowUp");
@@ -18,12 +24,16 @@ const Floor = ({ location }) => {
   const sKey = useKeyPress("s");
   const dKey = useKeyPress("d");
 
+  // avatar List for render
   const [avatars, setAvatars] = useState([]);
+  // user name and color
   const [name, setName] = useState("");
   const [color, setColor] = useState("");
-  const [x, setX] = useState(Math.floor(Math.random() * 760));
-  const [y, setY] = useState(Math.floor(Math.random() * 660));
+  // user Avatar Position
+  const [x, setX] = useState(Math.floor(Math.random() * 76) * 10);
+  const [y, setY] = useState(Math.floor(Math.random() * 66) * 10);
 
+  // cors fix ? not good solution
   var connectionOptions = {
     "force new connection": true,
     reconnectionAttempts: "Infinity",
@@ -31,42 +41,67 @@ const Floor = ({ location }) => {
     transports: ["websocket"],
   };
 
+  // useEffect on component mount
   useEffect(() => {
+    // parse name and color from URL
     const { name, color } = queryString.parse(location.search);
-    socket = io.connect(ENDPOINT, connectionOptions);
     setName(name);
     setColor(color);
+    // connect to socket
+    socket = io.connect(ENDPOINT, connectionOptions);
+    // add Avatar to server list
+    socket.emit("join", { name, color, x, y });
+    // listen for Avatarlist from server
+    socket.on("floorData", ({ avatars }) => {
+      setAvatars(avatars);
 
-    socket.emit("update", { name, color, x, y });
+      console.log(avatars.length);
+    });
 
-    return () => {
-      socket.off();
-    };
+    // listen for position Update of Avatars
+    socket.on("updateFloor", ({ updatedAvatar }) => {
+      //console.log(updatedAvatar.x, updatedAvatar.y, updatedAvatar.id);
+      console.log(avatars.length);
+      if (updatedAvatar) {
+        const updatedAvatars = avatars.map((avatar) => {
+          if (
+            avatar.name === updatedAvatar.name &&
+            avatar.color === updatedAvatar.color
+          ) {
+            avatar.x = updatedAvatar.x;
+            avatar.y = updatedAvatar.y;
+            console.log(avatar.x, avatar.y);
+          }
+          return avatar;
+        });
+        setAvatars(updatedAvatars);
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ENDPOINT, location.search]);
+  }, []);
 
-  useEffect(() => {
-    socket.on("floorData", ({ avatars }) => setAvatars(avatars));
-  }, [avatars]);
-
+  // user Avatar Movement
   useEffect(() => {
     const interval = setInterval(() => {
       if (ArrowUp | wKey && y > 0) {
-        setY(y - 1);
+        setY(y - 10);
       }
       if (ArrowDown | sKey && y < 660) {
-        setY(y + 1);
+        setY(y + 10);
       }
       if (ArrowRight | dKey && x < 760) {
-        setX(x + 1);
+        setX(x + 10);
       }
       if (ArrowLeft | aKey && x > 0) {
-        setX(x - 1);
+        setX(x - 10);
       }
-    }, 2);
-    if (name !== "" || color !== "") {
-      socket.emit("update", { name, color, x, y });
+    }, 20);
+
+    // update position to server
+    if (name !== "" && color !== "") {
+      socket.emit("update", { x, y });
     }
+
     return () => clearInterval(interval);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,9 +110,9 @@ const Floor = ({ location }) => {
   return (
     <div className="outerContainer">
       <div className="container"></div>
-      {avatars.map((avatar, i) => (
+      {avatars.map((avatar) => (
         <div
-          key={i}
+          key={avatar.id}
           className="Avatar"
           style={{
             background: avatar.color,
