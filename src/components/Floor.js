@@ -3,10 +3,9 @@ import queryString from "query-string";
 import io from "socket.io-client";
 import "../App.css";
 
-//const ENDPOINT = "https://avatario-test.herokuapp.com/";
-
 // location of server
-const ENDPOINT = "localhost:5000";
+const ENDPOINT = "https://avatario-test.herokuapp.com/";
+//const ENDPOINT = "localhost:5000";
 
 //empty socket for connection
 let socket;
@@ -41,7 +40,8 @@ const Floor = ({ location }) => {
     transports: ["websocket"],
   };
 
-  // useEffect on component mount
+  const [delay, setDelay] = React.useState(false);
+
   useEffect(() => {
     // parse name and color from URL
     const { name, color } = queryString.parse(location.search);
@@ -51,34 +51,45 @@ const Floor = ({ location }) => {
     socket = io.connect(ENDPOINT, connectionOptions);
     // add Avatar to server list
     socket.emit("join", { name, color, x, y });
+  }, []);
+
+  // useEffect on component mount
+  useEffect(() => {
     // listen for Avatarlist from server
     socket.on("floorData", ({ avatars }) => {
+      console.log("floorDatabefore:", avatars.length);
       setAvatars(avatars);
-
-      console.log(avatars.length);
+      console.log("floorData:", avatars.length);
     });
 
     // listen for position Update of Avatars
     socket.on("updateFloor", ({ updatedAvatar }) => {
-      //console.log(updatedAvatar.x, updatedAvatar.y, updatedAvatar.id);
-      console.log(avatars.length);
-      if (updatedAvatar) {
-        const updatedAvatars = avatars.map((avatar) => {
-          if (
-            avatar.name === updatedAvatar.name &&
-            avatar.color === updatedAvatar.color
-          ) {
-            avatar.x = updatedAvatar.x;
-            avatar.y = updatedAvatar.y;
-            console.log(avatar.x, avatar.y);
-          }
-          return avatar;
-        });
-        setAvatars(updatedAvatars);
+      setTimeout(() => {
+        setDelay(true);
+      }, 1);
+      if (delay) {
+        // console.log("updateFloor:", avatars.length);
+        // console.log(updatedAvatar.x, updatedAvatar.y, updatedAvatar.id);
+        if (updatedAvatar) {
+          const updatedAvatars = avatars.map((avatar) => {
+            if (
+              avatar.name === updatedAvatar.name &&
+              avatar.color === updatedAvatar.color
+            ) {
+              avatar.x = updatedAvatar.x;
+              avatar.y = updatedAvatar.y;
+            }
+            return avatar;
+          });
+          setAvatars(updatedAvatars);
+        }
       }
     });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [delay]);
+
+  useEffect(() => {});
 
   // user Avatar Movement
   useEffect(() => {
@@ -100,6 +111,7 @@ const Floor = ({ location }) => {
     // update position to server
     if (name !== "" && color !== "") {
       socket.emit("update", { x, y });
+      console.log("update:", avatars.length);
     }
 
     return () => clearInterval(interval);
