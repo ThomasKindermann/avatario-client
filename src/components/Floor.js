@@ -40,8 +40,6 @@ const Floor = ({ location }) => {
     transports: ["websocket"],
   };
 
-  // const [delay, setDelay] = React.useState(false);
-
   useEffect(() => {
     // parse name and color from URL
     const { name, color } = queryString.parse(location.search);
@@ -51,44 +49,13 @@ const Floor = ({ location }) => {
     socket = io.connect(ENDPOINT, connectionOptions);
     // add Avatar to server list
     socket.emit("join", { name, color, x, y });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
-  // useEffect on component mount
-  useEffect(() => {
     // listen for Avatarlist from server
     socket.on("floorData", ({ avatars }) => {
       setAvatars(avatars);
     });
-
-    // listen for position Update of Avatars
-    // socket.on("updateFloor", ({ updatedAvatar }) => {
-    //   setTimeout(() => {
-    //     setDelay(true);
-    //   }, 1);
-    //   if (delay) {
-    //     // console.log("updateFloor:", avatars.length);
-    //     // console.log(updatedAvatar.x, updatedAvatar.y, updatedAvatar.id);
-    //     if (updatedAvatar) {
-    //       const updatedAvatars = avatars.map((avatar) => {
-    //         if (
-    //           avatar.name === updatedAvatar.name &&
-    //           avatar.color === updatedAvatar.color
-    //         ) {
-    //           avatar.x = updatedAvatar.x;
-    //           avatar.y = updatedAvatar.y;
-    //         }
-    //         return avatar;
-    //       });
-    //       setAvatars(updatedAvatars);
-    //     }
-    //   }
-    // });
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {});
 
   // user Avatar Movement
   useEffect(() => {
@@ -110,7 +77,6 @@ const Floor = ({ location }) => {
     // update position to server
     if (name !== "" && color !== "") {
       socket.emit("update", { x, y });
-      console.log("update:", avatars.length);
     }
 
     return () => clearInterval(interval);
