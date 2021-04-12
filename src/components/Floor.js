@@ -51,6 +51,7 @@ const Floor = ({ location }) => {
     socket = io.connect(ENDPOINT, connectionOptions);
     // add Avatar to server list
     socket.emit("join", { name, color, x, y });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // useEffect on component mount
