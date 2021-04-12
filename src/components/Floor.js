@@ -53,18 +53,18 @@ const Floor = ({ location }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (ArrowUp | wKey && y > 0) {
-        setY(y - 10);
+        setY(y - 1);
       }
       if (ArrowDown | sKey && y < 660) {
-        setY(y + 10);
+        setY(y + 1);
       }
       if (ArrowRight | dKey && x < 760) {
-        setX(x + 10);
+        setX(x + 1);
       }
       if (ArrowLeft | aKey && x > 0) {
-        setX(x - 10);
+        setX(x - 1);
       }
-    }, 20);
+    }, 2);
 
     // update position to server
     if (name !== "" && color !== "") {
