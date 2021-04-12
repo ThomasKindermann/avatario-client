@@ -32,21 +32,13 @@ const Floor = ({ location }) => {
   const [x, setX] = useState(Math.floor(Math.random() * 76) * 10);
   const [y, setY] = useState(Math.floor(Math.random() * 66) * 10);
 
-  // cors fix ? not good solution
-  var connectionOptions = {
-    "force new connection": true,
-    reconnectionAttempts: "Infinity",
-    timeout: 10000,
-    transports: ["websocket"],
-  };
-
   useEffect(() => {
     // parse name and color from URL
     const { name, color } = queryString.parse(location.search);
     setName(name);
     setColor(color);
     // connect to socket
-    socket = io.connect(ENDPOINT, connectionOptions);
+    socket = io.connect(ENDPOINT, { transports: ["websocket"] });
     // add Avatar to server list
     socket.emit("join", { name, color, x, y });
 
