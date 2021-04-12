@@ -40,7 +40,7 @@ const Floor = ({ location }) => {
     transports: ["websocket"],
   };
 
-  const [delay, setDelay] = React.useState(false);
+  // const [delay, setDelay] = React.useState(false);
 
   useEffect(() => {
     // parse name and color from URL
@@ -58,37 +58,35 @@ const Floor = ({ location }) => {
   useEffect(() => {
     // listen for Avatarlist from server
     socket.on("floorData", ({ avatars }) => {
-      console.log("floorDatabefore:", avatars.length);
       setAvatars(avatars);
-      console.log("floorData:", avatars.length);
     });
 
     // listen for position Update of Avatars
-    socket.on("updateFloor", ({ updatedAvatar }) => {
-      setTimeout(() => {
-        setDelay(true);
-      }, 1);
-      if (delay) {
-        // console.log("updateFloor:", avatars.length);
-        // console.log(updatedAvatar.x, updatedAvatar.y, updatedAvatar.id);
-        if (updatedAvatar) {
-          const updatedAvatars = avatars.map((avatar) => {
-            if (
-              avatar.name === updatedAvatar.name &&
-              avatar.color === updatedAvatar.color
-            ) {
-              avatar.x = updatedAvatar.x;
-              avatar.y = updatedAvatar.y;
-            }
-            return avatar;
-          });
-          setAvatars(updatedAvatars);
-        }
-      }
-    });
+    // socket.on("updateFloor", ({ updatedAvatar }) => {
+    //   setTimeout(() => {
+    //     setDelay(true);
+    //   }, 1);
+    //   if (delay) {
+    //     // console.log("updateFloor:", avatars.length);
+    //     // console.log(updatedAvatar.x, updatedAvatar.y, updatedAvatar.id);
+    //     if (updatedAvatar) {
+    //       const updatedAvatars = avatars.map((avatar) => {
+    //         if (
+    //           avatar.name === updatedAvatar.name &&
+    //           avatar.color === updatedAvatar.color
+    //         ) {
+    //           avatar.x = updatedAvatar.x;
+    //           avatar.y = updatedAvatar.y;
+    //         }
+    //         return avatar;
+    //       });
+    //       setAvatars(updatedAvatars);
+    //     }
+    //   }
+    // });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [delay]);
+  }, []);
 
   useEffect(() => {});
 
