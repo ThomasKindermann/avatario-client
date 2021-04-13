@@ -4,8 +4,8 @@ import io from "socket.io-client";
 import "../App.css";
 
 // location of server
-//const ENDPOINT = "https://avatario-test.herokuapp.com/";
-const ENDPOINT = "localhost:5000";
+const ENDPOINT = "https://avatario-test.herokuapp.com/";
+//const ENDPOINT = "localhost:5000";
 
 //empty socket for connection
 let socket;
